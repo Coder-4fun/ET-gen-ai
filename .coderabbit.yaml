@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: "en-US"
+
+tone_instructions: |
+  Provide feedback in a professional, constructive, and concise tone.
+  Focus on significant issues, potential bugs, security vulnerabilities, and adherence to best practices.
+  Avoid nitpicking on stylistic choices unless they violate common conventions.
+
+ignore_branches:
+  - "wip/*"
+  - "draft/*"
+
+ignore_draft_pr: true
+
+path_filters:
+  - "!backend/venv/**"
+  - "!frontend/node_modules/**"
+  - "!backend/mock_data/**"
+  - "!backend/models/**"
+  - "!**/*.db"
+  - "!**/*.csv"
+
+file_path_instructions:
+  - path: "backend/**/*.py"
+    instructions: |
+      Focus on Python best practices, FastAPI endpoints, performance, error handling, type hints, and async/await correctness.
+  - path: "frontend/**/*.jsx"
+    instructions: |
+      Focus on React best practices, Vite usage, hooks optimization, component modularity, and error boundaries.
+
+# Customize the review features
+disable_poem: true
+release_notes: true
