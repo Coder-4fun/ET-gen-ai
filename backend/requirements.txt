@@ -1,0 +1,61 @@
+# ET Markets Intelligence Layer — Backend Dependencies
+# Python 3.11+
+
+# ─── Web Framework ──────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart==0.0.9
+sse-starlette==2.1.0
+
+# ─── Database ───────────────────────────────────────────────────────────────
+sqlalchemy[asyncio]==2.0.30
+aiosqlite==0.20.0          # SQLite fallback for demo mode
+asyncpg==0.29.0            # PostgreSQL async driver
+alembic==1.13.1
+
+# ─── Pydantic ───────────────────────────────────────────────────────────────
+pydantic==2.7.1
+pydantic-settings==2.3.4
+
+# ─── Cache / Queue ──────────────────────────────────────────────────────────
+redis==5.0.4
+celery[redis]==5.4.0
+
+# ─── Financial Data ─────────────────────────────────────────────────────────
+yfinance==0.2.40
+pandas==2.2.2
+numpy==1.26.4
+scipy==1.13.0
+pandas-ta==0.3.14b
+
+# ─── AI / NLP ───────────────────────────────────────────────────────────────
+torch==2.3.0
+transformers==4.41.2        # FinBERT (ProsusAI/finbert)
+sentence-transformers==3.0.1
+spacy==3.7.4
+vaderSentiment==3.3.2
+huggingface-hub==0.23.2
+
+# ─── LLM Client (OpenRouter-compatible) ─────────────────────────────────────
+openai==1.30.1              # OpenAI client — works with OpenRouter base URL
+
+# ─── Vector Store ───────────────────────────────────────────────────────────
+faiss-cpu==1.8.0
+
+# ─── Social Data ────────────────────────────────────────────────────────────
+praw==7.7.1                 # Reddit
+httpx==0.27.0               # Async HTTP (Twitter, NewsAPI)
+aiohttp==3.9.5
+
+# ─── Alerts ─────────────────────────────────────────────────────────────────
+sendgrid==6.11.0
+twilio==9.2.1
+
+# ─── Utilities ──────────────────────────────────────────────────────────────
+python-dotenv==1.0.1
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+cachetools==5.3.3
+pytz==2024.1
+websockets==12.0
+apscheduler==3.10.4         # Lightweight scheduler (alternative to Celery beat)

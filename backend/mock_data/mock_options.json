@@ -1,0 +1,32 @@
+{
+  "stock": "NIFTY",
+  "expiry": "2026-04-24",
+  "spot_price": 22184.50,
+  "pcr": 1.22,
+  "max_pain": 22500,
+  "iv_skew": "right-skewed",
+  "signal": "HighPCR",
+  "timestamp": "2026-03-27T12:00:00+05:30",
+  "chain": [
+    {"strike": 21000, "ce_oi": 125400, "ce_vol": 8200,  "ce_iv": 18.4, "ce_ltp": 1245.50, "pe_oi": 312600, "pe_vol": 22100, "pe_iv": 22.1, "pe_ltp": 58.30},
+    {"strike": 21500, "ce_oi": 245800, "ce_vol": 14500, "ce_iv": 17.2, "ce_ltp": 782.40,  "pe_oi": 428900, "pe_vol": 31200, "pe_iv": 20.8, "pe_ltp": 95.60},
+    {"strike": 22000, "ce_oi": 512400, "ce_vol": 38700, "ce_iv": 16.1, "ce_ltp": 312.80,  "pe_oi": 698200, "pe_vol": 52400, "pe_iv": 19.4, "pe_ltp": 182.40},
+    {"strike": 22100, "ce_oi": 389200, "ce_vol": 27300, "ce_iv": 15.8, "ce_ltp": 228.60,  "pe_oi": 542100, "pe_vol": 41800, "pe_iv": 18.9, "pe_ltp": 248.70},
+    {"strike": 22200, "ce_oi": 621500, "ce_vol": 45200, "ce_iv": 15.4, "ce_ltp": 156.90,  "pe_oi": 487300, "pe_vol": 38900, "pe_iv": 18.5, "pe_ltp": 328.40},
+    {"strike": 22300, "ce_oi": 748200, "ce_vol": 58900, "ce_iv": 15.1, "ce_ltp": 98.40,   "pe_oi": 412800, "pe_vol": 32100, "pe_iv": 18.2, "pe_ltp": 418.20},
+    {"strike": 22400, "ce_oi": 892400, "ce_vol": 71200, "ce_iv": 14.9, "ce_ltp": 55.20,   "pe_oi": 342100, "pe_vol": 27800, "pe_iv": 17.9, "pe_ltp": 524.80},
+    {"strike": 22500, "ce_oi": 1245600,"ce_vol": 98700, "ce_iv": 14.7, "ce_ltp": 28.40,   "pe_oi": 289400, "pe_vol": 23400, "pe_iv": 17.6, "pe_ltp": 648.50},
+    {"strike": 22600, "ce_oi": 856300, "ce_vol": 62400, "ce_iv": 14.5, "ce_ltp": 12.80,   "pe_oi": 198700, "pe_vol": 15800, "pe_iv": 17.3, "pe_ltp": 782.40},
+    {"strike": 23000, "ce_oi": 312800, "ce_vol": 21300, "ce_iv": 14.2, "ce_ltp": 3.80,    "pe_oi": 124500, "pe_vol": 9800,  "pe_iv": 17.1, "pe_ltp": 1124.60}
+  ],
+  "iv_curve": [
+    {"strike": 21000, "iv": 20.8},
+    {"strike": 21500, "iv": 19.2},
+    {"strike": 22000, "iv": 17.8},
+    {"strike": 22200, "iv": 16.9},
+    {"strike": 22400, "iv": 16.4},
+    {"strike": 22500, "iv": 16.1},
+    {"strike": 22600, "iv": 15.8},
+    {"strike": 23000, "iv": 15.6}
+  ]
+}

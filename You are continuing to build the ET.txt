@@ -1,0 +1,354 @@
+You are improving the ET Markets Intelligence Layer frontend and backend.
+This is NOT a rebuild. Read every section carefully before touching anything.
+
+I am sharing 6 screenshots of the current running app. 
+Analyze them first, then fix every broken thing, then add every new feature listed.
+Do not invent solutions — fix root causes.
+
+---
+
+## SECTION 1: BROKEN THINGS TO FIX (in priority order)
+
+### BUG 1 — DUPLICATE ALERT BANNERS (Critical, visible in every screenshot)
+The same ZOMATO BelowVWAP alert appears twice in the top banner strip on every page.
+Root cause: the WebSocket is firing the same signal twice, OR the alert state in Zustand 
+is not deduplicating before rendering, OR on reconnect the alerts array is being 
+appended to instead of replaced.
+Fix: deduplicate the alerts array by signal ID before storing in state. 
+Maximum 3 alerts in the banner at once. Auto-dismiss after 8 seconds with a slide-out animation.
+The dismiss X button must actually remove the item from state permanently.
+
+### BUG 2 — DISCOVER PAGE IS COMPLETELY EMPTY (Critical)
+The Discover section renders nothing except the two broken alert banners.
+The page is a black void. 
+Fix: build out the Discover section with real content.
+Content to show (all can use mock data for now):
+  - Sector Heat Map grid (14 Nifty sectors, color-coded by day performance)
+  - Top Movers strip (top 5 gainers + top 5 losers today)
+  - Upcoming earnings calendar (next 7 days)
+  - FII/DII flow bar for today
+Until real data is wired, use realistic mock data — never show an empty page.
+
+### BUG 3 — BULLISH / BEARISH SHOWS 0 / 0 (Medium)
+Dashboard Command Center shows "0 / 0" for Bullish/Bearish ratio.
+This means the signal direction is not being counted or the field name 
+does not match what the backend returns.
+Fix: trace the field name from the backend signal object (directional_bias) 
+all the way to this counter. Count signals where directional_bias === 'bullish'
+and directional_bias === 'bearish' from the active signals array.
+
+### BUG 4 — ALERT TEXT RANDOMLY SWITCHES TO HINDI (Medium)
+In some screenshots the alert banner text is in English 
+("ZOMATO is showing a BelowVWAP signal...") and in others it is in Hindi 
+("Zomato ka current price abhi VWAP se neeche hai...").
+The app must be consistent. 
+Fix: the AI explanation generator must always return English.
+Add language: 'en' enforcement to the Claude/LLM system prompt.
+Add a language guard on the frontend: if the explanation text contains 
+Devanagari characters, show the fallback template English version instead.
+
+### BUG 5 — PORTFOLIO VALUES LOOK WRONG (Low)
+Portfolio shows ₹1,73,863 invested but ₹1,27,868 current value — a 26% loss.
+HDFCBANK shows avg price ₹1,542 vs LTP ₹753.46 — a 51% loss.
+RELIANCE shows avg ₹2,720.5 vs LTP ₹1,346.11 — a 50% loss.
+These prices are clearly wrong mock data (LTP looks like it is half the real price).
+Fix: update the mock portfolio data to use realistic current NSE prices.
+RELIANCE ~₹1,346 is approximately correct. But avg price ₹2,720 implies a 
+purchase 4 years ago at peak. Change the mock data so most holdings show 
+realistic ±15% P&L, not -50%. This destroys trust in the demo.
+
+### BUG 6 — ANALYSE PAGE HAS NO PATTERN DETECTION OVERLAY (Medium)
+The chart loads TradingView correctly but the entire value proposition of 
+the chart module — detected patterns overlaid on the chart, support/resistance 
+lines, signal annotations — is missing.
+The chart is just a plain TradingView embed.
+Fix: below the chart, show a "Detected Patterns" panel that lists 
+patterns found on the currently selected stock (use mock data if the 
+detector isn't wired). Show: pattern name, timeframe, confidence, 
+plain English explanation, back-tested success rate.
+
+### BUG 7 — MARKET VIDEO IS TEXT-ONLY, NOT A VIDEO (Low)
+The Market Video section shows text scrolling with a progress bar. 
+This is not a video — it is a text teleprompter.
+Do not attempt to generate real video (out of scope).
+Instead: rebrand it clearly as "AI Market Briefing" not "AI Market Video".
+Make it feel intentional: large date headline, animated text reveal per sentence,
+auto-advance with a proper timeline scrubber. 
+Add a speaker icon that reads the text aloud using the browser's 
+Web Speech API (window.speechSynthesis) — this makes it feel like a real 
+audio briefing without any external API.
+
+---
+
+## SECTION 2: UI PROBLEMS — THE APP FEELS TOO "AI-GENERATED"
+
+The current UI suffers from 7 specific aesthetic problems. Fix each one:
+
+### UI PROBLEM 1 — GLASSMORPHISM EVERYWHERE
+Every card uses the same semi-transparent blur-background glass effect.
+This was trendy in 2021. It makes everything look samey and blurry.
+Replace with: solid dark surfaces with precise 1px borders.
+Specific values: background #0D0D0D for the page, #141414 for cards, 
+#1C1C1C for elevated cards, #252525 for inputs and hover states.
+Border: 1px solid rgba(255,255,255,0.06) for all cards.
+No blur. No transparency. Flat, precise, terminal-like surfaces.
+
+### UI PROBLEM 2 — TEAL/CYAN ACCENT COLOR IS OVERUSED
+Every interactive element, badge, glow, and highlight is teal (#00D4AA or similar).
+This is the default "AI fintech" color palette used by 50 other apps.
+Replace the accent system with:
+  - Primary accent: #E8FF47 (electric yellow-green) — used for active states, 
+    selected nav items, and the most important number on each card
+  - Confirmation/profit: #22C55E (clean green)
+  - Loss/danger: #EF4444 (clean red)
+  - Neutral data: #A3A3A3
+  - LIVE badge: #FF3B30 (iOS-style red dot)
+  - Everything else: white or gray
+This palette feels like a Bloomberg terminal, not a crypto app.
+
+### UI PROBLEM 3 — SIGNAL CONFIDENCE SHOWN AS PERCENTAGE, NOT SCORE
+"88%" confidence as a percentage reads like a probability claim.
+Change the display format to: score out of 100 shown as a horizontal 
+bar with the number beside it. Example: [████████░░] 88
+This feels more like a scoring system than a fake statistical claim.
+
+### UI PROBLEM 4 — EVERY CARD HAS THE SAME HEIGHT AND LAYOUT
+The dashboard bento grid shows 4 identical-sized metric cards.
+This makes the layout feel like a template, not a designed product.
+Make the grid asymmetric: 
+  - Active Signals card: full-height left column, large number
+  - Market Regime card: wide card spanning 2 columns, more detail visible
+  - Portfolio Snapshot: right column, taller than the metrics
+  - Signal Accuracy: medium width with the accuracy bar prominent
+Use a CSS grid with named areas, not repeat(4, 1fr).
+
+### UI PROBLEM 5 — NO VISUAL HIERARCHY BETWEEN INFORMATION TYPES
+Every text element — headlines, numbers, labels, metadata, timestamps — 
+is the same weight and similar size.
+Establish a clear 4-level hierarchy:
+  Level 1 (Hero numbers): 32px, weight 600, white
+  Level 2 (Card titles): 15px, weight 500, white
+  Level 3 (Labels and metadata): 12px, weight 400, #6B6B6B
+  Level 4 (Timestamps and tags): 11px, weight 400, #4A4A4A
+Apply this consistently everywhere. Numbers like "22,819.60" should be 
+Level 1. Labels like "NIFTY 50" should be Level 3.
+
+### UI PROBLEM 6 — SIGNAL CARDS IN RADAR LOOK LIKE BLOG POSTS
+The Radar signal list renders each signal as a text-heavy list item.
+It should look like a trading terminal signal feed.
+For each signal card use this exact layout:
+  Left edge: 3px color bar (green=bullish, red=bearish)
+  First row: [COMPANY NAME large] [Signal type pill] [Score bar] [Date right-aligned]
+  Second row: Headline text in a slightly larger, bolder font
+  Third row: ₹ value in electric yellow | TAM or impact metric | right: sector tag
+No excessive padding. Tight rows. Dense information. Terminal feel.
+
+### UI PROBLEM 7 — NAVIGATION ACTIVE STATE USES BACKGROUND HIGHLIGHT
+The active nav item uses a full-width background highlight (a selected row highlight).
+This feels like a settings menu, not a product nav.
+Replace with: 
+  - Active item: text in electric yellow (#E8FF47), no background
+  - A 2px left border in electric yellow on the active item
+  - All inactive items: #6B6B6B text, no background
+  - Hover: white text only, no background change
+This is how Linear, Vercel dashboard, and Raycast handle nav.
+
+---
+
+## SECTION 3: FEATURES TO ADD (in hackathon priority order)
+
+### FEATURE 1 — AI CHAT THAT ACTUALLY KNOWS YOUR PORTFOLIO (Highest priority)
+The AI Chat button exists but the conversation is generic.
+The chatbot must know:
+  - The user's exact holdings (from the Portfolio page data)
+  - The active signals on their holdings
+  - Today's market performance
+  - The current market regime
+
+Opening the chat should show 4 pre-written smart prompts:
+  → "Why is my RELIANCE position down so much?"
+  → "Which of my holdings has the most bullish signals right now?"
+  → "Should I be worried about HDFCBANK given today's signals?"
+  → "What's the most interesting opportunity in the market today?"
+
+These are not generic — they reference real portfolio data.
+The chat panel slides in from the right as a full-height drawer, 
+not a popup bubble. Width: 420px. Shows conversation history.
+Each response must cite its source: [Source: NSE Filings] or [Source: Signal Engine].
+
+### FEATURE 2 — SIGNAL DETAIL DRAWER (High priority)
+Clicking any signal anywhere in the app should open a right-side drawer 
+(400px wide, full height) showing:
+  - Stock name + sector + current price + day change
+  - Signal confidence score with the reasoning breakdown (which detectors fired)
+  - The full AI-generated explanation (not truncated)
+  - Historical base rate: "Last 3 times this pattern appeared on this stock: +8.2%, +3.1%, -2.4%"
+  - Support / Resistance / Target levels
+  - "Set Alert" toggle
+  - "View Chart" button that navigates to Analyse with this stock pre-loaded
+This drawer must work from Dashboard, Radar, Portfolio — everywhere signals appear.
+
+### FEATURE 3 — STOCK SEARCH WITH INSTANT SIGNAL PREVIEW (High priority)
+The current app has no global search.
+Add a CMD+K (or search icon in header) command palette:
+  - Type any NSE stock name or symbol
+  - Show instant results as you type (fuzzy match)
+  - Each result shows: symbol, company name, sector, day change, 
+    and a small colored dot if there are active signals (green=bullish, red=bearish)
+  - Press Enter or click → navigate to Analyse with that stock loaded
+  - Recent searches saved locally (last 5)
+
+### FEATURE 4 — PORTFOLIO RISK HEATMAP (Medium priority)
+In the Portfolio section, below the holdings table, add a visual risk section:
+  - A horizontal bar showing portfolio concentration: 
+    "HDFCBANK takes 47% of your portfolio — high concentration risk"
+  - Sector exposure donut chart (small, right side)
+  - A "Signals on your holdings" row: 
+    shows a dot per holding, color = current signal bias for that stock
+  - "Biggest risk today" callout card: 
+    the one holding that has the most bearish signals + the worst P&L
+
+### FEATURE 5 — EARNINGS CALENDAR (Medium priority)
+In the Discover section, a compact earnings calendar:
+  - Shows next 14 days of scheduled quarterly result dates
+  - For each company: name, sector, expected EPS (from analyst estimates), 
+    whether the stock has active signals before the result
+  - Highlight companies where the AI signal is contradicting analyst consensus
+    (analyst expects beat, but our sentiment signal is bearish — high value alert)
+
+### FEATURE 6 — PRICE ALERT CREATOR (Medium priority)
+From any stock in the app, right-click or long-press → "Set Price Alert"
+Alert types:
+  - Price above: [___] notify me
+  - Price below: [___] notify me  
+  - Signal confidence above 80 on this stock
+  - % move more than X% in a day
+Alerts show in a simple list in Tools & Settings → Price Alerts.
+Notification method: in-app banner (already exists).
+Store alerts in localStorage for the hackathon (no backend needed).
+
+### FEATURE 7 — LIVE SIGNAL COUNT BADGE IMPROVEMENT (Low priority, high visibility)
+The Radar nav item shows "11 LIVE" badge. Make this more dynamic:
+  - The number should animate (count up) when new signals arrive
+  - Color: green if new signals are bullish, red if bearish, amber if mixed
+  - Show the breakdown on hover: tooltip "8 bullish · 3 bearish · 0 neutral"
+  - Pulse animation on the red LIVE dot when a new signal arrives (2 second pulse)
+
+### FEATURE 8 — KEYBOARD SHORTCUTS (Low priority, high impression)
+Add a keyboard shortcut system that power users will love:
+  D → Dashboard
+  R → Radar  
+  A → Analyse
+  V → Discover
+  CMD+K → Search
+  CMD+/ → Show all shortcuts (modal)
+  ESC → Close any open drawer
+  1-5 → Navigate to sub-tabs within current section
+Show a tiny "⌘K" hint in the search area to let users discover it.
+
+---
+
+## SECTION 4: DATA & BACKEND ISSUES TO FIX
+
+### DATA ISSUE 1 — PORTFOLIO LTP PRICES ARE WRONG
+HDFCBANK LTP shown as ₹753.46. Actual NSE price is ~₹1,750.
+The data source for LTP in the portfolio is either using wrong endpoint,
+wrong symbol format (HDFCBANK vs HDFCBANK.NS), or a stale cache.
+Fix the NSE quote fetcher to use the correct symbol format.
+If NSE API is rate-limited, use Yahoo Finance as fallback: 
+  symbol + ".NS" for NSE stocks.
+
+### DATA ISSUE 2 — SIGNAL PIPELINE ONLY COVERS 10 STOCKS
+The backend detectors scan RELIANCE, ZOMATO, HDFCBANK, TATAMOTORS, PAYTM, INFY 
+and a few others. The Opportunity Radar shows signals for Bajaj Finance, Infosys,
+Sun Pharma, Reliance — but these must be coming from mock data, not the live engine.
+Make it clear in the UI which signals are LIVE (from the detector) vs SEEDED (mock).
+Add a small "MOCK" badge in grey on seeded signals during the demo.
+This is honest and actually impressive — it shows the architecture is ready to scale.
+
+### DATA ISSUE 3 — MARKET REGIME DETECTION
+The dashboard shows "Weak Bear, Confidence 54%, Multiplier 0.85x" — this is good.
+But the regime is never reflected in the signal cards themselves.
+When the regime is Weak Bear, bullish signals should show a small 
+"⚠ Bear market caution" note beneath the confidence score.
+This shows the regime detection is actually doing something, not just decorative.
+
+---
+
+## SECTION 5: DEMO-DAY SPECIFIC INSTRUCTIONS
+
+The product will be presented to judges. These specific things must work perfectly:
+
+1. The dashboard must load in under 2 seconds with no blank states.
+   Every section must show data immediately — use realistic mock data 
+   with a subtle "SIMULATED DATA" watermark in the bottom-right corner 
+   (12px, #333, only visible on hover).
+
+2. The Radar Opportunity Radar must show at least 8 signals, 
+   mix of FII Accumulation, Insider Trade, Promoter Buy, Regulatory.
+   All signals must be for real, well-known Indian companies.
+   All confidence scores between 71-94 (never round numbers like 70 or 90).
+   All dates within the last 7 days.
+
+3. The AI Chat must respond within 3 seconds.
+   If the real Claude API is slow, show a streaming typewriter effect 
+   that begins immediately while waiting for the full response.
+   Never show a blank or spinning state for more than 1 second.
+
+4. When a judge clicks a signal, the detail drawer must open instantly 
+   (no loading state) showing the full explanation.
+   Have 3 signals pre-loaded with complete, detailed AI explanations 
+   in the mock data (FII Accumulation on Reliance, Insider Trade on Bajaj Finance,
+   Regulatory on Sun Pharma).
+
+5. The Portfolio page must show a realistic portfolio:
+   5-6 holdings, mostly at ±10-15% P&L, one clear winner (+28%), 
+   one clear loser (-18%). This tells a story. A portfolio of all -50% 
+   holdings destroys credibility in the first 10 seconds.
+
+---
+
+## WHAT NOT TO DO
+
+- Do not rebuild the navigation from scratch again
+- Do not add any more tabs or sections beyond what exists
+- Do not add loading skeletons that show longer than 800ms
+- Do not use purple, blue-purple, or neon colors
+- Do not use the word "powerful" or "insights" anywhere in the UI copy
+- Do not add any modals that require a close button to dismiss 
+  (use click-outside or ESC instead)
+- Do not make the AI Chat button pulse or glow constantly 
+  (only pulse once when a new signal arrives)
+- Do not use Comic Sans. (Obvious but stating it.)
+
+---
+
+## COPY GUIDELINES
+
+Replace all generic fintech copy with specific, confident language:
+
+REPLACE: "Your personalized market intelligence overview"
+WITH: "Command Center — 20 signals active, 11 high confidence"
+
+REPLACE: "Real-time corporate events · Institutional flows · Insider activity"  
+WITH: "Scanning 500 NSE stocks · Updated 4 mins ago"
+
+REPLACE: "Connect broker to see holdings"
+WITH: "Add your holdings manually or connect Zerodha / Angel One"
+
+REPLACE: "AI Market Video"
+WITH: "Daily Briefing — 28 Mar 2026 · 75 seconds"
+
+Remove every instance of: "intelligent", "powerful", "seamless", 
+"robust", "comprehensive", "leverage", "innovative".
+These words make the product sound like a pitch deck, not a real tool.
+
+---
+
+## OUTPUT EXPECTED
+
+After making all fixes:
+1. List every file changed and what specifically changed
+2. Screenshot descriptions of what the Discover page now shows
+3. Confirm the 5 demo-day items work correctly
+4. List the 3 remaining items that would need another full day to complete properly

@@ -1,0 +1,11 @@
+node_modules/
+venv/
+.env
+dist/
+__pycache__/
+*.pyc
+.vscode/
+*.db
+backend/etmarkets.db
+backend/models/
+.DS_Store

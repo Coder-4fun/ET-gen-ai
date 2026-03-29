@@ -1,0 +1,33 @@
+# ET Markets Intelligence Layer — Lightweight Dependencies (No ML)
+# Use this for quick hackathon startup without heavy ML models.
+# Run: pip install -r requirements-lite.txt
+
+# ─── Web Framework ──────────────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+python-multipart
+
+# ─── Database ───────────────────────────────────────────────────────────────
+sqlalchemy[asyncio]
+aiosqlite
+
+# ─── Pydantic ───────────────────────────────────────────────────────────────
+pydantic
+
+# ─── Financial Data ─────────────────────────────────────────────────────────
+pandas
+numpy
+yfinance
+
+# ─── NLP (lightweight fallback) ─────────────────────────────────────────────
+vaderSentiment
+
+# ─── HTTP ───────────────────────────────────────────────────────────────────
+httpx
+
+# ─── Utilities ──────────────────────────────────────────────────────────────
+python-dotenv
+apscheduler
+
+# ─── LLM (OpenRouter) ──────────────────────────────────────────────────────
+openai
